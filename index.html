@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>💘 Will You Be My Valentine?</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- Romantic fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Great+Vibes&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
   body{
@@ -101,24 +102,28 @@
     background:#000;
   }
 
+  /* Center overlay */
   #overlay{
     position:absolute;
     inset:0;
     display:flex;
-    align-items:flex-end;
-    padding:18px 16px;
+    align-items:center;       /* center vertically */
+    justify-content:center;   /* center horizontally */
+    text-align:center;
+    padding:20px;
     pointer-events:none;
-    background:linear-gradient(to top,rgba(0,0,0,.65),transparent 60%);
+    background:rgba(0,0,0,0.35); /* soft cinematic tint */
   }
 
+  /* Romantic message */
   #loveText{
     color:#fff;
-    font-size:clamp(16px,4vw,22px);
-    font-weight:800;
-    text-shadow:0 4px 14px rgba(0,0,0,.55);
-    text-align:center;        /* center text */
-    width:100%;
-    line-height:1.6;
+    font-family:'Great Vibes', cursive;
+    font-size:clamp(28px,6vw,44px);
+    line-height:1.5;
+    text-align:center;
+    max-width:92%;
+    text-shadow:0 6px 20px rgba(0,0,0,0.6);
   }
 
   /* Tap overlay for audio problems */
@@ -139,6 +144,7 @@
     padding:14px 18px;
     border-radius:999px;
     box-shadow:0 12px 30px rgba(0,0,0,.25);
+    font-family:"Poppins",sans-serif;
   }
 
   /* Offscreen YouTube player */
@@ -218,7 +224,7 @@
   noBtn.addEventListener("mouseenter", moveNo);
   noBtn.addEventListener("pointerdown", e => { e.preventDefault(); moveNo(); });
 
-  // --- YouTube music (optional) ---
+  // --- YouTube music ---
   let ytPlayer = null;
 
   function loadYTApiOnce(){
@@ -294,8 +300,7 @@
       video.controls = true;
     }
 
-    // OPTIONAL: start YouTube music too
-    // If you DON'T want YouTube music, comment out the next line.
+    // Start YouTube music
     startYouTubeMusic();
 
     // Best-effort fullscreen without losing overlay
@@ -311,7 +316,7 @@
     try { ytPlayer && ytPlayer.playVideo(); } catch {}
   });
 
-  // Extra retry for YouTube on any tap on page2 (helps with blockers)
+  // Extra retry for YouTube on any tap on page2
   page2.addEventListener("pointerdown", () => {
     try { ytPlayer && ytPlayer.playVideo(); } catch {}
   });
