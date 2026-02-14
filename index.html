@@ -60,7 +60,10 @@
     position:absolute;
     box-shadow:0 10px 22px rgba(255,0,120,.22);
     touch-action:manipulation;
+    transition:transform .15s ease;
   }
+  .btn:hover{ transform:scale(1.06); }
+  .btn:active{ transform:scale(0.98); }
 
   #yesBtn{
     left:50%;
@@ -78,7 +81,7 @@
     color:#7a003b;
   }
 
-  /* Page 2 fullscreen */
+  /* Page 2 */
   #page2{
     position:fixed;
     inset:0;
@@ -87,10 +90,13 @@
     z-index:50;
   }
 
+  /* IMPORTANT: keep video inline so overlay stays visible */
   #valVideo{
     width:100%;
     height:100%;
-    object-fit:cover; /* fills screen */
+    object-fit:cover;
+    transform: scale(0.92); /* unzoom a bit */
+    transform-origin:center;
     display:block;
     background:#000;
   }
@@ -112,7 +118,7 @@
     text-shadow:0 4px 14px rgba(0,0,0,.55);
   }
 
-  /* Tap-to-start overlay if blocked */
+  /* Tap overlay for audio problems */
   #tapStart{
     position:absolute;
     inset:0;
@@ -158,22 +164,21 @@
 
   <!-- PAGE 2 -->
   <div id="page2">
-    <video id="valVideo" playsinline loop preload="auto">
+    <!-- Keep muted initially so autoplay works; we unmute after YES -->
+    <video id="valVideo" playsinline loop preload="auto" muted>
       <source src="valentine.mp4" type="video/mp4">
     </video>
 
-    <div id="tapStart"><div class="pill">Tap to start 🔊🎶💗</div></div>
+    <div id="tapStart"><div class="pill">Tap to start sound 🔊🎶💗</div></div>
 
     <div id="overlay">
       <div id="loveText">YAY!! 💖 I’m so lucky to have you. Happy Valentine’s, my love 🌹🥰</div>
     </div>
   </div>
 
-  <!-- YouTube music player -->
   <div id="ytWrap"><div id="ytPlayer"></div></div>
 
 <script>
-  // YouTube song (your link -> video id)
   const YOUTUBE_VIDEO_ID = "lplaAZBWiqY";
 
   const stage = document.getElementById("stage");
@@ -199,20 +204,7 @@
   noBtn.addEventListener("mouseenter", moveNo);
   noBtn.addEventListener("pointerdown", e => { e.preventDefault(); moveNo(); });
 
-  // --- Fullscreen helpers ---
-  async function goFullscreenForVideo() {
-    try {
-      // Best for desktop / Android Chrome
-      if (video.requestFullscreen) return await video.requestFullscreen();
-      if (video.webkitRequestFullscreen) return await video.webkitRequestFullscreen();
-    } catch {}
-    try {
-      // iOS Safari sometimes supports this
-      if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
-    } catch {}
-  }
-
-  // --- YouTube music (created after click for reliability) ---
+  // --- YouTube music (optional) ---
   let ytPlayer = null;
 
   function loadYTApiOnce(){
@@ -223,7 +215,7 @@
     document.head.appendChild(tag);
   }
 
-  function ensureYTPlayerAndPlay(){
+  function startYouTubeMusic(){
     loadYTApiOnce();
 
     const start = () => {
@@ -259,46 +251,53 @@
     setTimeout(() => { try { ytPlayer && ytPlayer.playVideo(); } catch {} }, 1400);
   }
 
-  // --- Start everything ---
+  async function enterFullscreenOnContainer() {
+    // Fullscreen the container (overlay stays visible)
+    try {
+      if (page2.requestFullscreen) await page2.requestFullscreen();
+    } catch {}
+  }
+
   async function startExperience() {
-    // Switch pages
     page1.style.display = "none";
     page2.style.display = "block";
 
-    // Make sure video reloads and is ready
+    // Ensure video is ready after display switch
     video.load();
 
-    // Turn on video sound
+    // Start muted autoplay (usually allowed)
+    try { await video.play(); } catch {}
+
+    // Turn sound on (still within YES click)
     video.muted = false;
     video.volume = 1.0;
 
-    // Try to play video (with sound)
-    let videoOk = true;
-    try { await video.play(); }
-    catch { videoOk = false; video.controls = true; }
+    try {
+      await video.play();
+      tapStart.style.display = "none";
+    } catch {
+      tapStart.style.display = "flex";
+      video.controls = true;
+    }
 
-    // Start YouTube music AFTER the page switch (and after video starts)
-    // If you want ONLY video sound, comment this out:
-    ensureYTPlayerAndPlay();
+    // OPTIONAL: start YouTube music too
+    // If you DON'T want YouTube music, comment out the next line.
+    startYouTubeMusic();
 
-    // Fullscreen attempt (best effort)
-    await goFullscreenForVideo();
-
-    // If video or music got blocked, show tap overlay
-    // (tapping will retry both)
-    if (!videoOk) tapStart.style.display = "flex";
+    // Best-effort fullscreen without losing overlay
+    await enterFullscreenOnContainer();
   }
 
   yesBtn.addEventListener("click", startExperience);
 
-  // If browser blocks playback, user tap retries
+  // If something was blocked, a tap retries sound + music
   tapStart.addEventListener("pointerdown", async () => {
     tapStart.style.display = "none";
     try { video.muted = false; await video.play(); } catch { tapStart.style.display = "flex"; }
     try { ytPlayer && ytPlayer.playVideo(); } catch {}
   });
 
-  // Also allow tapping anywhere on page2 to retry music
+  // Extra retry for YouTube on any tap on page2 (helps with blockers)
   page2.addEventListener("pointerdown", () => {
     try { ytPlayer && ytPlayer.playVideo(); } catch {}
   });
