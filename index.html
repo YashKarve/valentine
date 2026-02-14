@@ -8,217 +8,272 @@
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-body{
-  margin:0;
-  min-height:100vh;
-  display:grid;
-  place-items:center;
-  font-family:"Poppins",sans-serif;
-  background:
-    radial-gradient(circle at 20% 20%, #ffd1e6, transparent 40%),
-    radial-gradient(circle at 80% 0%, #ffc0d9, transparent 45%),
-    linear-gradient(180deg,#ffe4ef,#fff0f6);
-  overflow:hidden;
-}
+  body{
+    margin:0;
+    min-height:100vh;
+    display:grid;
+    place-items:center;
+    font-family:"Poppins",sans-serif;
+    background:
+      radial-gradient(circle at 20% 20%, #ffd1e6, transparent 40%),
+      radial-gradient(circle at 80% 0%, #ffc0d9, transparent 45%),
+      linear-gradient(180deg,#ffe4ef,#fff0f6);
+    overflow:hidden;
+  }
 
-.card{
-  width:min(560px,92vw);
-  background:rgba(255,255,255,0.9);
-  border-radius:24px;
-  padding:28px 22px;
-  box-shadow:0 18px 50px rgba(255,105,180,0.25);
-  text-align:center;
-}
+  .card{
+    width:min(560px,92vw);
+    background:rgba(255,255,255,0.9);
+    border-radius:24px;
+    padding:28px 22px;
+    box-shadow:0 18px 50px rgba(255,105,180,0.25);
+    text-align:center;
+  }
 
-h1{
-  font-family:"Pacifico",cursive;
-  font-size:38px;
-  color:#ff2e7a;
-}
+  h1{
+    font-family:"Pacifico",cursive;
+    font-size:clamp(30px,5vw,42px);
+    color:#ff2e7a;
+    margin:6px 0 12px;
+    text-shadow:0 4px 12px rgba(255,0,128,0.18);
+  }
 
-.stage{
-  position:relative;
-  height:230px;
-  border-radius:18px;
-  background:#ffe6f0;
-  border:2px dashed #ff9fc2;
-}
+  p{
+    margin:0 0 16px;
+    color:#b33c70;
+    font-weight:600;
+  }
 
-.btn{
-  border:none;
-  padding:14px 22px;
-  border-radius:999px;
-  font-weight:800;
-  font-size:16px;
-  cursor:pointer;
-  position:absolute;
-}
+  .stage{
+    position:relative;
+    height:230px;
+    border-radius:18px;
+    background:linear-gradient(180deg,#ffe0ec,#fff4f8);
+    border:2px dashed #ff9fc2;
+    overflow:hidden;
+  }
 
-#yesBtn{
-  left:50%;
-  top:60%;
-  transform:translate(-120%,-50%);
-  background:#ff2e7a;
-  color:white;
-}
+  .btn{
+    border:none;
+    padding:14px 22px;
+    border-radius:999px;
+    font-weight:800;
+    font-size:16px;
+    cursor:pointer;
+    position:absolute;
+    box-shadow:0 10px 22px rgba(255,0,120,.22);
+    touch-action: manipulation;
+    transition:transform .15s ease;
+  }
+  .btn:hover{ transform:scale(1.06); }
+  .btn:active{ transform:scale(0.98); }
 
-#noBtn{
-  left:50%;
-  top:60%;
-  transform:translate(20%,-50%);
-  background:#ffb6d2;
-}
+  #yesBtn{
+    left:50%;
+    top:60%;
+    transform:translate(-120%,-50%);
+    background:linear-gradient(45deg,#ff2e7a,#ff6aa7);
+    color:white;
+  }
 
-#page2{
-  position:fixed;
-  inset:0;
-  display:none;
-  background:black;
-  z-index:50;
-}
+  #noBtn{
+    left:50%;
+    top:60%;
+    transform:translate(20%,-50%);
+    background:#ffb6d2;
+    color:#7a003b;
+  }
 
-#valVideo{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
+  /* Page 2: full screen video */
+  #page2{
+    position:fixed;
+    inset:0;
+    display:none;
+    background:#000;
+    z-index:50;
+  }
 
-#overlay{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:flex-end;
-  padding:20px;
-  background:linear-gradient(to top,rgba(0,0,0,.6),transparent 60%);
-}
+  #valVideo{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    background:#000;
+  }
 
-#loveText{
-  color:white;
-  font-size:22px;
-  font-weight:700;
-}
+  #overlay{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:flex-end;
+    padding:18px 16px;
+    pointer-events:none;
+    background:linear-gradient(to top,rgba(0,0,0,.65),transparent 60%);
+  }
 
-#ytWrap{
-  position:fixed;
-  left:-9999px;
-  top:-9999px;
-  width:360px;
-  height:240px;
-}
+  #loveText{
+    color:white;
+    font-size:clamp(16px,4vw,22px);
+    font-weight:800;
+    text-shadow:0 4px 14px rgba(0,0,0,.55);
+  }
+
+  #tapHint{
+    position:absolute;
+    top:14px;
+    left:14px;
+    right:14px;
+    color:rgba(255,255,255,.88);
+    font-size:12px;
+    font-weight:600;
+    text-shadow:0 2px 10px rgba(0,0,0,.55);
+    pointer-events:none;
+    opacity:0;
+    transition:opacity .2s ease;
+  }
+
+  /* offscreen YT player */
+  #ytWrap{
+    position:fixed;
+    left:-9999px;
+    top:-9999px;
+    width:360px;
+    height:240px;
+    overflow:hidden;
+  }
 </style>
 </head>
 
 <body>
+  <!-- PAGE 1 -->
+  <div class="card" id="page1">
+    <h1>Will you be my Valentine? 💘</h1>
+    <p>(There is only one correct choice 😌💕)</p>
 
-<div class="card" id="page1">
-  <h1>Will you be my Valentine? 💘</h1>
-
-  <div class="stage" id="stage">
-    <button id="yesBtn" class="btn">Yes 💖</button>
-    <button id="noBtn" class="btn">No 🙈</button>
-  </div>
-</div>
-
-<div id="page2">
-  <video id="valVideo" autoplay loop playsinline>
-    <source src="valentine.mp4" type="video/mp4">
-  </video>
-  <div id="overlay">
-    <div id="loveText">
-      YAY!! 💖 I’m so lucky to have you. Happy Valentine’s, my love 🌹🥰
+    <div class="stage" id="stage">
+      <button id="yesBtn" class="btn">Yes 💖</button>
+      <button id="noBtn" class="btn">No 🙈</button>
     </div>
   </div>
-</div>
 
-<div id="ytWrap"><div id="ytPlayer"></div></div>
+  <!-- PAGE 2 -->
+  <div id="page2">
+    <div id="tapHint">Tap once if the video doesn’t start 💗</div>
+
+    <video id="valVideo" autoplay loop muted playsinline preload="auto">
+      <source src="valentine.mp4" type="video/mp4">
+    </video>
+
+    <div id="overlay">
+      <div id="loveText">YAY!! 💖 I’m so lucky to have you. Happy Valentine’s, my love 🌹🥰</div>
+    </div>
+  </div>
+
+  <div id="ytWrap"><div id="ytPlayer"></div></div>
 
 <script>
-const stage = document.getElementById("stage");
-const noBtn = document.getElementById("noBtn");
-const yesBtn = document.getElementById("yesBtn");
-const page1 = document.getElementById("page1");
-const page2 = document.getElementById("page2");
-const video = document.getElementById("valVideo");
+  const stage = document.getElementById("stage");
+  const noBtn  = document.getElementById("noBtn");
+  const yesBtn = document.getElementById("yesBtn");
+  const page1  = document.getElementById("page1");
+  const page2  = document.getElementById("page2");
+  const video  = document.getElementById("valVideo");
+  const tapHint = document.getElementById("tapHint");
 
-const YOUTUBE_VIDEO_ID = "lplaAZBWiqY";
+  const YOUTUBE_VIDEO_ID = "lplaAZBWiqY";
+  let ytPlayer = null;
 
-function moveNo(){
-  const s = stage.getBoundingClientRect();
-  const b = noBtn.getBoundingClientRect();
-  const x = Math.random()*(s.width-b.width-20)+10;
-  const y = Math.random()*(s.height-b.height-20)+10;
-  noBtn.style.left = x+"px";
-  noBtn.style.top = y+"px";
-  noBtn.style.transform="none";
-}
-
-noBtn.addEventListener("mouseenter",moveNo);
-noBtn.addEventListener("pointerdown",e=>{
-  e.preventDefault();
-  moveNo();
-});
-
-function goToPage2(){
-  page1.style.display="none";
-  page2.style.display="block";
-
-  video.play().catch(()=>{});
-
-  if(document.documentElement.requestFullscreen){
-    document.documentElement.requestFullscreen().catch(()=>{});
+  function moveNo(){
+    const s = stage.getBoundingClientRect();
+    const b = noBtn.getBoundingClientRect();
+    const x = Math.random() * (s.width - b.width - 20) + 10;
+    const y = Math.random() * (s.height - b.height - 20) + 10;
+    noBtn.style.left = x + "px";
+    noBtn.style.top  = y + "px";
+    noBtn.style.transform = "none";
   }
-}
+  noBtn.addEventListener("mouseenter", moveNo);
+  noBtn.addEventListener("pointerdown", e => { e.preventDefault(); moveNo(); });
 
-let ytPlayer=null;
+  function loadYouTubeAPIOnce(){
+    if (window.__ytLoaded) return;
+    window.__ytLoaded = true;
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+  }
 
-function loadYouTube(){
-  if(window.__ytLoaded) return;
-  window.__ytLoaded=true;
+  function createAndPlayYT(){
+    loadYouTubeAPIOnce();
 
-  const tag=document.createElement("script");
-  tag.src="https://www.youtube.com/iframe_api";
-  document.head.appendChild(tag);
-}
+    const start = () => {
+      if (!window.YT || !YT.Player) { setTimeout(start, 200); return; }
 
-function createAndPlayYT(){
-  loadYouTube();
+      if (!ytPlayer) {
+        ytPlayer = new YT.Player("ytPlayer", {
+          videoId: YOUTUBE_VIDEO_ID,
+          width: "360",
+          height: "240",
+          playerVars: {
+            autoplay: 1,
+            controls: 0,
+            loop: 1,
+            playlist: YOUTUBE_VIDEO_ID,
+            playsinline: 1,
+            rel: 0,
+            modestbranding: 1
+          },
+          events: {
+            onReady: () => {
+              try { ytPlayer.setVolume(70); ytPlayer.playVideo(); } catch {}
+            }
+          }
+        });
+      } else {
+        try { ytPlayer.playVideo(); } catch {}
+      }
+    };
 
-  const start=()=>{
-    if(!window.YT||!YT.Player){
-      setTimeout(start,200);
-      return;
+    start();
+    setTimeout(() => { try { ytPlayer && ytPlayer.playVideo(); } catch {} }, 600);
+    setTimeout(() => { try { ytPlayer && ytPlayer.playVideo(); } catch {} }, 1400);
+  }
+
+  async function goToPage2AndPlayVideo(){
+    page1.style.display = "none";
+    page2.style.display = "block";
+
+    // Ensure the browser re-reads the source after display switch
+    video.load();
+
+    // Attempt to play
+    try {
+      await video.play();
+      tapHint.style.opacity = "0";
+    } catch {
+      // If blocked, show hint + controls so user can tap play
+      tapHint.style.opacity = "1";
+      video.controls = true;
     }
 
-    if(!ytPlayer){
-      ytPlayer=new YT.Player("ytPlayer",{
-        videoId:YOUTUBE_VIDEO_ID,
-        width:"360",
-        height:"240",
-        playerVars:{
-          autoplay:1,
-          controls:0,
-          loop:1,
-          playlist:YOUTUBE_VIDEO_ID,
-          playsinline:1
-        },
-        events:{
-          onReady:()=>{ ytPlayer.playVideo(); }
-        }
-      });
-    }else{
-      ytPlayer.playVideo();
+    // Fullscreen attempt (Android yes; iOS limited)
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(()=>{});
     }
-  };
+  }
 
-  start();
-}
+  yesBtn.addEventListener("click", async () => {
+    await goToPage2AndPlayVideo();
+    createAndPlayYT();
+  });
 
-yesBtn.addEventListener("click",()=>{
-  goToPage2();
-  createAndPlayYT();
-});
+  // If autoplay was blocked, first tap will start video
+  page2.addEventListener("pointerdown", async () => {
+    try {
+      await video.play();
+      tapHint.style.opacity = "0";
+    } catch {}
+  });
 </script>
-
 </body>
 </html>
-
