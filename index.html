@@ -92,16 +92,16 @@
     background:#000;
     z-index:50;
   }
-  
+
   #valVideo{
     width:100%;
     height:100%;
     object-fit:cover;
-    transform: scale(0.52);   /* 👈 unzoom */
+    transform: scale(0.92); /* unzoom a bit */
+    transform-origin:center;
     display:block;
     background:#000;
   }
-
 
   #overlay{
     position:absolute;
@@ -120,8 +120,8 @@
     text-shadow:0 4px 14px rgba(0,0,0,.55);
   }
 
-  /* Tap-to-start overlay (only shown if autoplay blocked) */
-  #tapToStart{
+  /* Tap-to-enable audio overlay */
+  #tapSound{
     position:absolute;
     inset:0;
     display:none;
@@ -131,23 +131,13 @@
     background:rgba(0,0,0,.35);
     backdrop-filter: blur(2px);
   }
-  #tapToStart .pill{
+  #tapSound .pill{
     background:rgba(255,255,255,.92);
     color:#ff2e7a;
     font-weight:900;
     padding:14px 18px;
     border-radius:999px;
     box-shadow:0 12px 30px rgba(0,0,0,.25);
-  }
-
-  /* offscreen YT player */
-  #ytWrap{
-    position:fixed;
-    left:-9999px;
-    top:-9999px;
-    width:360px;
-    height:240px;
-    overflow:hidden;
   }
 </style>
 </head>
@@ -166,30 +156,29 @@
 
   <!-- PAGE 2 -->
   <div id="page2">
+    <!-- Keep muted initially so autoplay works, then we unmute after YES -->
     <video id="valVideo" autoplay loop muted playsinline preload="auto">
       <source src="valentine.mp4" type="video/mp4">
+      Your browser does not support the video tag.
     </video>
 
-    <div id="tapToStart"><div class="pill">Tap to start 💗</div></div>
+    <div id="tapSound"><div class="pill">Tap to turn sound on 🔊💗</div></div>
 
     <div id="overlay">
       <div id="loveText">YAY!! 💖 I’m so lucky to have you. Happy Valentine’s, my love 🌹🥰</div>
     </div>
   </div>
 
-  <div id="ytWrap"><div id="ytPlayer"></div></div>
-
 <script>
   const stage = document.getElementById("stage");
   const noBtn  = document.getElementById("noBtn");
   const yesBtn = document.getElementById("yesBtn");
+
   const page1  = document.getElementById("page1");
   const page2  = document.getElementById("page2");
-  const video  = document.getElementById("valVideo");
-  const tapToStart = document.getElementById("tapToStart");
 
-  const YOUTUBE_VIDEO_ID = "lplaAZBWiqY";
-  let ytPlayer = null;
+  const video  = document.getElementById("valVideo");
+  const tapSound = document.getElementById("tapSound");
 
   // NO button dodge
   function moveNo(){
@@ -204,92 +193,48 @@
   noBtn.addEventListener("mouseenter", moveNo);
   noBtn.addEventListener("pointerdown", e => { e.preventDefault(); moveNo(); });
 
-  // YouTube (start later to avoid fighting with video autoplay)
-  function loadYouTubeAPIOnce(){
-    if (window.__ytLoaded) return;
-    window.__ytLoaded = true;
-    const tag = document.createElement("script");
-    tag.src = "https://www.youtube.com/iframe_api";
-    document.head.appendChild(tag);
-  }
-
-  function createAndPlayYT(){
-    loadYouTubeAPIOnce();
-
-    const start = () => {
-      if (!window.YT || !YT.Player) { setTimeout(start, 200); return; }
-
-      if (!ytPlayer) {
-        ytPlayer = new YT.Player("ytPlayer", {
-          videoId: YOUTUBE_VIDEO_ID,
-          width: "360",
-          height: "240",
-          playerVars: {
-            autoplay: 1,
-            controls: 0,
-            loop: 1,
-            playlist: YOUTUBE_VIDEO_ID,
-            playsinline: 1,
-            rel: 0,
-            modestbranding: 1
-          },
-          events: {
-            onReady: () => {
-              try { ytPlayer.setVolume(70); ytPlayer.playVideo(); } catch {}
-            }
-          }
-        });
-      } else {
-        try { ytPlayer.playVideo(); } catch {}
-      }
-    };
-
-    start();
-    setTimeout(() => { try { ytPlayer && ytPlayer.playVideo(); } catch {} }, 600);
-    setTimeout(() => { try { ytPlayer && ytPlayer.playVideo(); } catch {} }, 1400);
-  }
-
-  async function showPage2AndPlayVideo(){
+  async function showPage2AndStartVideoWithSound(){
     page1.style.display = "none";
     page2.style.display = "block";
 
-    // force reload after being shown
+    // Reload source after display switch
     video.load();
+
+    // Autoplay muted first (usually allowed)
+    try { await video.play(); } catch {}
+
+    // Now attempt to turn sound on (this is still inside the YES click flow)
+    video.muted = false;
+    video.volume = 1.0;
 
     try {
       await video.play();
-      tapToStart.style.display = "none";
+      tapSound.style.display = "none";
     } catch {
-      // show tap overlay if blocked
-      tapToStart.style.display = "flex";
+      // If unmuted play is blocked, show tap overlay
+      tapSound.style.display = "flex";
       video.controls = true;
     }
-  }
-
-  // YES: video first, then music
-  yesBtn.addEventListener("click", async () => {
-    await showPage2AndPlayVideo();
-
-    // Let the video "lock in" first, then start music
-    setTimeout(() => {
-      createAndPlayYT();
-    }, 1000);
 
     // Fullscreen attempt (Android yes; iOS limited)
     if (document.documentElement.requestFullscreen) {
       document.documentElement.requestFullscreen().catch(()=>{});
     }
+  }
+
+  yesBtn.addEventListener("click", () => {
+    showPage2AndStartVideoWithSound();
   });
 
-  // If autoplay blocked, tapping starts it
-  tapToStart.addEventListener("pointerdown", async () => {
+  // If browser blocks unmuted playback, user tap will enable sound
+  tapSound.addEventListener("pointerdown", async () => {
+    video.muted = false;
+    video.volume = 1.0;
     try {
       await video.play();
-      tapToStart.style.display = "none";
+      tapSound.style.display = "none";
     } catch {}
   });
 </script>
 </body>
 </html>
-
-
