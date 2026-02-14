@@ -8,285 +8,313 @@
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-body{
-  margin:0;
-  min-height:100vh;
-  display:grid;
-  place-items:center;
-  font-family:"Poppins",sans-serif;
-  background:
-    radial-gradient(circle at 20% 20%, #ffd1e6, transparent 40%),
-    radial-gradient(circle at 80% 0%, #ffc0d9, transparent 45%),
-    linear-gradient(180deg,#ffe4ef,#fff0f6);
-  overflow:hidden;
-}
+  body{
+    margin:0;
+    min-height:100vh;
+    display:grid;
+    place-items:center;
+    font-family:"Poppins",sans-serif;
+    background:
+      radial-gradient(circle at 20% 20%, #ffd1e6, transparent 40%),
+      radial-gradient(circle at 80% 0%, #ffc0d9, transparent 45%),
+      linear-gradient(180deg,#ffe4ef,#fff0f6);
+    overflow:hidden;
+  }
 
-/* PAGE 1 */
-.card{
-  width:min(560px,92vw);
-  background:rgba(255,255,255,0.92);
-  border-radius:24px;
-  padding:28px 22px;
-  box-shadow:0 18px 50px rgba(255,105,180,0.25);
-  text-align:center;
-}
+  /* Page 1 */
+  .card{
+    width:min(560px,92vw);
+    background:rgba(255,255,255,0.9);
+    border-radius:24px;
+    padding:28px 22px;
+    box-shadow:0 18px 50px rgba(255,105,180,0.25);
+    text-align:center;
+  }
 
-h1{
-  font-family:"Pacifico",cursive;
-  font-size:clamp(30px,5vw,42px);
-  color:#ff2e7a;
-}
+  h1{
+    font-family:"Pacifico",cursive;
+    font-size:clamp(30px,5vw,42px);
+    color:#ff2e7a;
+    margin:6px 0 12px;
+    text-shadow:0 4px 12px rgba(255,0,128,0.18);
+  }
 
-.stage{
-  position:relative;
-  height:230px;
-  border-radius:18px;
-  background:linear-gradient(180deg,#ffe0ec,#fff4f8);
-  border:2px dashed #ff9fc2;
-  overflow:hidden;
-}
+  p{ margin:0 0 16px; color:#b33c70; font-weight:600; }
 
-.btn{
-  border:none;
-  padding:14px 22px;
-  border-radius:999px;
-  font-weight:800;
-  font-size:16px;
-  cursor:pointer;
-  position:absolute;
-}
+  .stage{
+    position:relative;
+    height:230px;
+    border-radius:18px;
+    background:linear-gradient(180deg,#ffe0ec,#fff4f8);
+    border:2px dashed #ff9fc2;
+    overflow:hidden;
+  }
 
-#yesBtn{
-  left:50%;
-  top:60%;
-  transform:translate(-120%,-50%);
-  background:#ff2e7a;
-  color:#fff;
-}
+  .btn{
+    border:none;
+    padding:14px 22px;
+    border-radius:999px;
+    font-weight:800;
+    font-size:16px;
+    cursor:pointer;
+    position:absolute;
+    box-shadow:0 10px 22px rgba(255,0,120,.22);
+    touch-action:manipulation;
+    transition:transform .15s ease;
+  }
+  .btn:hover{ transform:scale(1.06); }
+  .btn:active{ transform:scale(0.98); }
 
-#noBtn{
-  left:50%;
-  top:60%;
-  transform:translate(20%,-50%);
-  background:#ffb6d2;
-}
+  #yesBtn{
+    left:50%;
+    top:60%;
+    transform:translate(-120%,-50%);
+    background:linear-gradient(45deg,#ff2e7a,#ff6aa7);
+    color:#fff;
+  }
 
-/* PAGE 2 FULLSCREEN */
-#page2{
-  position:fixed;
-  inset:0;
-  display:none;
-  background:#000;
-  z-index:50;
-  overflow:hidden;
-}
+  #noBtn{
+    left:50%;
+    top:60%;
+    transform:translate(20%,-50%);
+    background:#ffb6d2;
+    color:#7a003b;
+  }
 
-/* TRUE FULLSCREEN VIDEO */
-#valVideo{
-  position:absolute;
-  top:0;
-  left:0;
-  width:100vw;
-  height:100vh;
-  object-fit:cover;
-}
+  /* Page 2 */
+  #page2{
+    position:fixed;
+    inset:0;
+    display:none;
+    background:#000;
+    z-index:50;
+  }
 
-/* MESSAGE OVERLAY */
-#overlay{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:flex-end;
-  justify-content:center;
-  padding:24px;
-  background:linear-gradient(to top,rgba(0,0,0,.7),transparent 60%);
-}
+  /* IMPORTANT: keep video inline so overlay stays visible */
+  #valVideo{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    transform: scale(0.92); /* unzoom a bit */
+    transform-origin:center;
+    display:block;
+    background:#000;
+  }
 
-#loveText{
-  color:#fff;
-  font-size:clamp(16px,4vw,22px);
-  font-weight:700;
-  text-align:center;
-  line-height:1.6;
-  max-width:90%;
-}
+  #overlay{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:flex-end;
+    padding:18px 16px;
+    pointer-events:none;
+    background:linear-gradient(to top,rgba(0,0,0,.65),transparent 60%);
+  }
 
-/* TAP BUTTON */
-#tapStart{
-  position:absolute;
-  inset:0;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:60;
-}
+  #loveText{
+    color:#fff;
+    font-size:clamp(16px,4vw,22px);
+    font-weight:800;
+    text-shadow:0 4px 14px rgba(0,0,0,.55);
+    text-align:center;        /* center text */
+    width:100%;
+    line-height:1.6;
+  }
 
-.pill{
-  background:white;
-  padding:14px 20px;
-  border-radius:999px;
-  font-weight:900;
-  color:#ff2e7a;
-}
+  /* Tap overlay for audio problems */
+  #tapStart{
+    position:absolute;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:60;
+    background:rgba(0,0,0,.35);
+    backdrop-filter: blur(2px);
+  }
+  #tapStart .pill{
+    background:rgba(255,255,255,.92);
+    color:#ff2e7a;
+    font-weight:900;
+    padding:14px 18px;
+    border-radius:999px;
+    box-shadow:0 12px 30px rgba(0,0,0,.25);
+  }
 
-/* Hidden YouTube player */
-#ytWrap{
-  position:fixed;
-  left:-9999px;
-  top:-9999px;
-  width:360px;
-  height:240px;
-}
+  /* Offscreen YouTube player */
+  #ytWrap{
+    position:fixed;
+    left:-9999px;
+    top:-9999px;
+    width:360px;
+    height:240px;
+    overflow:hidden;
+  }
 </style>
 </head>
 
 <body>
+  <!-- PAGE 1 -->
+  <div class="card" id="page1">
+    <h1>Will you be my Valentine? 💘</h1>
+    <p>(There is only one correct choice 😌💕)</p>
 
-<!-- PAGE 1 -->
-<div class="card" id="page1">
-  <h1>Will you be my Valentine? 💘</h1>
-
-  <div class="stage" id="stage">
-    <button id="yesBtn" class="btn">Yes 💖</button>
-    <button id="noBtn" class="btn">No 🙈</button>
-  </div>
-</div>
-
-<!-- PAGE 2 -->
-<div id="page2">
-
-  <video id="valVideo" playsinline loop preload="auto" muted>
-    <source src="valentine.mp4" type="video/mp4">
-  </video>
-
-  <div id="tapStart"><div class="pill">Tap to start 🔊🎶💗</div></div>
-
-  <div id="overlay">
-    <div id="loveText">
-      Happy Valentine’s Day, my love ❤️<br><br>
-
-      Six years with you, and somehow every day still feels new, warm,  
-      and filled with laughter. Even though I can’t be there beside you  
-      right now, please know that you mean the world to me.<br><br>
-
-      I’m sorry I can’t hold you today — but don’t worry,  
-      because in just two weeks we’ll finally be together again,  
-      celebrating us the way we always do. ✨<br><br>
-
-      Thank you for loving me, supporting me,  
-      and being my safe place through everything.<br><br>
-
-      I love you endlessly… today, tomorrow, and always. 💕
+    <div class="stage" id="stage">
+      <button id="yesBtn" class="btn">Yes 💖</button>
+      <button id="noBtn" class="btn">No 🙈</button>
     </div>
   </div>
 
-</div>
+  <!-- PAGE 2 -->
+  <div id="page2">
+    <!-- Keep muted initially so autoplay works; we unmute after YES -->
+    <video id="valVideo" playsinline loop preload="auto" muted>
+      <source src="valentine.mp4" type="video/mp4">
+    </video>
 
-<div id="ytWrap"><div id="ytPlayer"></div></div>
+    <div id="tapStart"><div class="pill">Tap to start sound 🔊🎶💗</div></div>
+
+    <div id="overlay">
+      <div id="loveText">
+        Happy Valentine’s Day, my love ❤️<br><br>
+        Six years with you, and somehow every day still feels new, warm,<br>
+        and filled with laughter. Even though I can’t be there beside you<br>
+        right now, please know that you mean the world to me.<br><br>
+        I’m sorry I can’t be there today — but don’t worry,<br>
+        because in just two weeks we’ll finally be together again,<br>
+        celebrating us the way we always do. ✨<br><br>
+        Thank you for loving me, supporting me,<br>
+        and being my safe place through everything.<br><br>
+        I love you endlessly… today, tomorrow, and always. 💕
+      </div>
+    </div>
+  </div>
+
+  <div id="ytWrap"><div id="ytPlayer"></div></div>
 
 <script>
-const YOUTUBE_VIDEO_ID="lplaAZBWiqY";
+  const YOUTUBE_VIDEO_ID = "lplaAZBWiqY";
 
-const stage=document.getElementById("stage");
-const noBtn=document.getElementById("noBtn");
-const yesBtn=document.getElementById("yesBtn");
+  const stage = document.getElementById("stage");
+  const noBtn  = document.getElementById("noBtn");
+  const yesBtn = document.getElementById("yesBtn");
 
-const page1=document.getElementById("page1");
-const page2=document.getElementById("page2");
-const video=document.getElementById("valVideo");
-const tapStart=document.getElementById("tapStart");
+  const page1 = document.getElementById("page1");
+  const page2 = document.getElementById("page2");
 
-/* NO button dodge */
-function moveNo(){
-  const s=stage.getBoundingClientRect();
-  const b=noBtn.getBoundingClientRect();
-  const x=Math.random()*(s.width-b.width-20)+10;
-  const y=Math.random()*(s.height-b.height-20)+10;
-  noBtn.style.left=x+"px";
-  noBtn.style.top=y+"px";
-  noBtn.style.transform="none";
-}
-noBtn.addEventListener("mouseenter",moveNo);
-noBtn.addEventListener("pointerdown",e=>{e.preventDefault();moveNo();});
+  const video = document.getElementById("valVideo");
+  const tapStart = document.getElementById("tapStart");
 
-/* YOUTUBE MUSIC */
-let ytPlayer=null;
+  // --- NO button dodge ---
+  function moveNo(){
+    const s = stage.getBoundingClientRect();
+    const b = noBtn.getBoundingClientRect();
+    const x = Math.random() * (s.width - b.width - 20) + 10;
+    const y = Math.random() * (s.height - b.height - 20) + 10;
+    noBtn.style.left = x + "px";
+    noBtn.style.top  = y + "px";
+    noBtn.style.transform = "none";
+  }
+  noBtn.addEventListener("mouseenter", moveNo);
+  noBtn.addEventListener("pointerdown", e => { e.preventDefault(); moveNo(); });
 
-function loadYT(){
-  if(window.__ytLoaded) return;
-  window.__ytLoaded=true;
-  const tag=document.createElement("script");
-  tag.src="https://www.youtube.com/iframe_api";
-  document.head.appendChild(tag);
-}
+  // --- YouTube music (optional) ---
+  let ytPlayer = null;
 
-function playYouTubeMusic(){
-  loadYT();
-
-  const start=()=>{
-    if(!window.YT||!YT.Player){
-      setTimeout(start,200);
-      return;
-    }
-
-    if(!ytPlayer){
-      ytPlayer=new YT.Player("ytPlayer",{
-        videoId:YOUTUBE_VIDEO_ID,
-        playerVars:{
-          autoplay:1,
-          controls:0,
-          loop:1,
-          playlist:YOUTUBE_VIDEO_ID,
-          playsinline:1
-        },
-        events:{
-          onReady:()=>{
-            ytPlayer.setVolume(80);
-            ytPlayer.playVideo();
-          }
-        }
-      });
-    } else {
-      ytPlayer.playVideo();
-    }
-  };
-
-  start();
-  setTimeout(()=>{try{ytPlayer.playVideo()}catch{}},800);
-}
-
-/* START EXPERIENCE */
-async function startExperience(){
-  page1.style.display="none";
-  page2.style.display="block";
-
-  video.load();
-
-  try{await video.play();}catch{}
-
-  video.muted=false;
-  video.volume=1;
-
-  let ok=true;
-  try{await video.play();}
-  catch{
-    ok=false;
-    video.controls=true;
+  function loadYTApiOnce(){
+    if (window.__ytLoaded) return;
+    window.__ytLoaded = true;
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
   }
 
-  playYouTubeMusic();
+  function startYouTubeMusic(){
+    loadYTApiOnce();
 
-  if(!ok) tapStart.style.display="flex";
-}
+    const start = () => {
+      if (!window.YT || !YT.Player) { setTimeout(start, 200); return; }
 
-yesBtn.addEventListener("click",startExperience);
+      if (!ytPlayer) {
+        ytPlayer = new YT.Player("ytPlayer", {
+          videoId: YOUTUBE_VIDEO_ID,
+          width: "360",
+          height: "240",
+          playerVars: {
+            autoplay: 1,
+            controls: 0,
+            loop: 1,
+            playlist: YOUTUBE_VIDEO_ID,
+            playsinline: 1,
+            rel: 0,
+            modestbranding: 1
+          },
+          events: {
+            onReady: () => {
+              try { ytPlayer.setVolume(70); ytPlayer.playVideo(); } catch {}
+            }
+          }
+        });
+      } else {
+        try { ytPlayer.playVideo(); } catch {}
+      }
+    };
 
-tapStart.addEventListener("pointerdown",async()=>{
-  tapStart.style.display="none";
-  try{video.muted=false;await video.play();}catch{tapStart.style.display="flex";}
-  try{ytPlayer&&ytPlayer.playVideo();}catch{}
-});
+    start();
+    setTimeout(() => { try { ytPlayer && ytPlayer.playVideo(); } catch {} }, 600);
+    setTimeout(() => { try { ytPlayer && ytPlayer.playVideo(); } catch {} }, 1400);
+  }
+
+  async function enterFullscreenOnContainer() {
+    // Fullscreen the container (overlay stays visible)
+    try {
+      if (page2.requestFullscreen) await page2.requestFullscreen();
+    } catch {}
+  }
+
+  async function startExperience() {
+    page1.style.display = "none";
+    page2.style.display = "block";
+
+    // Ensure video is ready after display switch
+    video.load();
+
+    // Start muted autoplay (usually allowed)
+    try { await video.play(); } catch {}
+
+    // Turn sound on (still within YES click)
+    video.muted = false;
+    video.volume = 1.0;
+
+    try {
+      await video.play();
+      tapStart.style.display = "none";
+    } catch {
+      tapStart.style.display = "flex";
+      video.controls = true;
+    }
+
+    // OPTIONAL: start YouTube music too
+    // If you DON'T want YouTube music, comment out the next line.
+    startYouTubeMusic();
+
+    // Best-effort fullscreen without losing overlay
+    await enterFullscreenOnContainer();
+  }
+
+  yesBtn.addEventListener("click", startExperience);
+
+  // If something was blocked, a tap retries sound + music
+  tapStart.addEventListener("pointerdown", async () => {
+    tapStart.style.display = "none";
+    try { video.muted = false; await video.play(); } catch { tapStart.style.display = "flex"; }
+    try { ytPlayer && ytPlayer.playVideo(); } catch {}
+  });
+
+  // Extra retry for YouTube on any tap on page2 (helps with blockers)
+  page2.addEventListener("pointerdown", () => {
+    try { ytPlayer && ytPlayer.playVideo(); } catch {}
+  });
 </script>
-
 </body>
 </html>
