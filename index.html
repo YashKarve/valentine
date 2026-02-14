@@ -24,7 +24,7 @@ body{
 /* PAGE 1 */
 .card{
   width:min(560px,92vw);
-  background:rgba(255,255,255,0.9);
+  background:rgba(255,255,255,0.92);
   border-radius:24px;
   padding:28px 22px;
   box-shadow:0 18px 50px rgba(255,105,180,0.25);
@@ -71,46 +71,44 @@ h1{
   background:#ffb6d2;
 }
 
-/* PAGE 2 */
+/* PAGE 2 FULLSCREEN */
 #page2{
   position:fixed;
   inset:0;
   display:none;
   background:#000;
   z-index:50;
-
-  /* CENTER EVERYTHING */
-  display:flex;
-  align-items:center;
-  justify-content:center;
   overflow:hidden;
 }
 
-/* CENTERED VIDEO */
+/* TRUE FULLSCREEN VIDEO */
 #valVideo{
   position:absolute;
   top:0;
   left:0;
   width:100vw;
   height:100vh;
-  object-fit:cover;   /* fills entire screen */
-  transform:none;     /* ❌ remove scale */
+  object-fit:cover;
 }
 
-/* TEXT OVERLAY */
+/* MESSAGE OVERLAY */
 #overlay{
   position:absolute;
   inset:0;
   display:flex;
   align-items:flex-end;
-  padding:18px 16px;
-  background:linear-gradient(to top,rgba(0,0,0,.65),transparent 60%);
+  justify-content:center;
+  padding:24px;
+  background:linear-gradient(to top,rgba(0,0,0,.7),transparent 60%);
 }
 
 #loveText{
   color:#fff;
   font-size:clamp(16px,4vw,22px);
-  font-weight:800;
+  font-weight:700;
+  text-align:center;
+  line-height:1.6;
+  max-width:90%;
 }
 
 /* TAP BUTTON */
@@ -163,22 +161,25 @@ h1{
 
   <div id="tapStart"><div class="pill">Tap to start 🔊🎶💗</div></div>
 
-  <div id="loveText">
-  Happy Valentine’s Day, my love ❤️<br><br>
+  <div id="overlay">
+    <div id="loveText">
+      Happy Valentine’s Day, my love ❤️<br><br>
 
-  Six years with you, and somehow every day still feels new, warm,  
-  and filled with laughter. Even though I can’t be there beside you  
-  right now, please know that you mean the world to me.<br><br>
+      Six years with you, and somehow every day still feels new, warm,  
+      and filled with laughter. Even though I can’t be there beside you  
+      right now, please know that you mean the world to me.<br><br>
 
-  I’m sorry I can’t hold you today — but don’t worry,  
-  because in just two weeks we’ll finally be together again,  
-  celebrating us the way we always do. ✨<br><br>
+      I’m sorry I can’t hold you today — but don’t worry,  
+      because in just two weeks we’ll finally be together again,  
+      celebrating us the way we always do. ✨<br><br>
 
-  Thank you for loving me, supporting me,  
-  and being my safe place through everything.<br><br>
+      Thank you for loving me, supporting me,  
+      and being my safe place through everything.<br><br>
 
-  I love you endlessly… today, tomorrow, and always. 💕
-</div>
+      I love you endlessly… today, tomorrow, and always. 💕
+    </div>
+  </div>
+
 </div>
 
 <div id="ytWrap"><div id="ytPlayer"></div></div>
@@ -195,7 +196,7 @@ const page2=document.getElementById("page2");
 const video=document.getElementById("valVideo");
 const tapStart=document.getElementById("tapStart");
 
-/* NO button moves */
+/* NO button dodge */
 function moveNo(){
   const s=stage.getBoundingClientRect();
   const b=noBtn.getBoundingClientRect();
@@ -231,8 +232,6 @@ function playYouTubeMusic(){
     if(!ytPlayer){
       ytPlayer=new YT.Player("ytPlayer",{
         videoId:YOUTUBE_VIDEO_ID,
-        width:"360",
-        height:"240",
         playerVars:{
           autoplay:1,
           controls:0,
@@ -259,17 +258,17 @@ function playYouTubeMusic(){
 /* START EXPERIENCE */
 async function startExperience(){
   page1.style.display="none";
-  page2.style.display="flex";
+  page2.style.display="block";
 
   video.load();
 
-  try{ await video.play(); }catch{}
+  try{await video.play();}catch{}
 
   video.muted=false;
   video.volume=1;
 
   let ok=true;
-  try{ await video.play(); }
+  try{await video.play();}
   catch{
     ok=false;
     video.controls=true;
@@ -291,5 +290,3 @@ tapStart.addEventListener("pointerdown",async()=>{
 
 </body>
 </html>
-
-
