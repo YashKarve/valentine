@@ -5,326 +5,293 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>💘 Will You Be My Valentine?</title>
 
-<!-- Romantic fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Great+Vibes&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-  body{
-    margin:0;
-    min-height:100vh;
-    display:grid;
-    place-items:center;
-    font-family:"Poppins",sans-serif;
-    background:
-      radial-gradient(circle at 20% 20%, #ffd1e6, transparent 40%),
-      radial-gradient(circle at 80% 0%, #ffc0d9, transparent 45%),
-      linear-gradient(180deg,#ffe4ef,#fff0f6);
-    overflow:hidden;
-  }
+body{
+  margin:0;
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  font-family:"Poppins",sans-serif;
+  background:
+    radial-gradient(circle at 20% 20%, #ffd1e6, transparent 40%),
+    radial-gradient(circle at 80% 0%, #ffc0d9, transparent 45%),
+    linear-gradient(180deg,#ffe4ef,#fff0f6);
+  overflow:hidden;
+}
 
-  /* Page 1 */
-  .card{
-    width:min(560px,92vw);
-    background:rgba(255,255,255,0.9);
-    border-radius:24px;
-    padding:28px 22px;
-    box-shadow:0 18px 50px rgba(255,105,180,0.25);
-    text-align:center;
-  }
+/* PAGE 1 */
+.card{
+  width:min(560px,92vw);
+  background:rgba(255,255,255,0.92);
+  border-radius:24px;
+  padding:28px 22px;
+  box-shadow:0 18px 50px rgba(255,105,180,0.25);
+  text-align:center;
+}
 
-  h1{
-    font-family:"Pacifico",cursive;
-    font-size:clamp(30px,5vw,42px);
-    color:#ff2e7a;
-    margin:6px 0 12px;
-    text-shadow:0 4px 12px rgba(255,0,128,0.18);
-  }
+h1{
+  font-family:"Pacifico",cursive;
+  font-size:clamp(30px,5vw,42px);
+  color:#ff2e7a;
+}
 
-  p{ margin:0 0 16px; color:#b33c70; font-weight:600; }
+.stage{
+  position:relative;
+  height:230px;
+  border-radius:18px;
+  background:linear-gradient(180deg,#ffe0ec,#fff4f8);
+  border:2px dashed #ff9fc2;
+  overflow:hidden;
+}
 
-  .stage{
-    position:relative;
-    height:230px;
-    border-radius:18px;
-    background:linear-gradient(180deg,#ffe0ec,#fff4f8);
-    border:2px dashed #ff9fc2;
-    overflow:hidden;
-  }
+.btn{
+  border:none;
+  padding:14px 22px;
+  border-radius:999px;
+  font-weight:800;
+  font-size:16px;
+  cursor:pointer;
+  position:absolute;
+}
 
-  .btn{
-    border:none;
-    padding:14px 22px;
-    border-radius:999px;
-    font-weight:800;
-    font-size:16px;
-    cursor:pointer;
-    position:absolute;
-    box-shadow:0 10px 22px rgba(255,0,120,.22);
-    touch-action:manipulation;
-    transition:transform .15s ease;
-  }
-  .btn:hover{ transform:scale(1.06); }
-  .btn:active{ transform:scale(0.98); }
+#yesBtn{
+  left:50%;
+  top:60%;
+  transform:translate(-120%,-50%);
+  background:#ff2e7a;
+  color:#fff;
+}
 
-  #yesBtn{
-    left:50%;
-    top:60%;
-    transform:translate(-120%,-50%);
-    background:linear-gradient(45deg,#ff2e7a,#ff6aa7);
-    color:#fff;
-  }
+#noBtn{
+  left:50%;
+  top:60%;
+  transform:translate(20%,-50%);
+  background:#ffb6d2;
+}
 
-  #noBtn{
-    left:50%;
-    top:60%;
-    transform:translate(20%,-50%);
-    background:#ffb6d2;
-    color:#7a003b;
-  }
+/* PAGE 2 FULLSCREEN */
+#page2{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
+  display:none;
+  background:#000;
+  z-index:50;
+  overflow:hidden;
+}
 
-  /* Page 2 */
-  #page2{
-    position:fixed;
-    inset:0;
-    display:none;
-    background:#000;
-    z-index:50;
-  }
+/* TRUE FULLSCREEN VIDEO */
+#valVideo{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
+  object-fit:cover;
+}
 
-  /* IMPORTANT: keep video inline so overlay stays visible */
-  #valVideo{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    transform: scale(0.92); /* unzoom a bit */
-    transform-origin:center;
-    display:block;
-    background:#000;
-  }
+/* CENTERED MESSAGE */
+#overlay{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  background:rgba(0,0,0,0.35);
+}
 
-  /* Center overlay */
-  #overlay{
-    position:absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    display:flex;
-    align-items:center;      /* vertical center */
-    justify-content:center;  /* horizontal center */
-    text-align:center;
-    pointer-events:none;
-    background:rgba(0,0,0,0.35);
-  }
+#loveText{
+  color:#fff;
+  font-family:'Quicksand', sans-serif;
+  font-size:clamp(18px,4.5vw,26px);
+  line-height:1.7;
+  max-width:90%;
+  text-shadow:0 6px 18px rgba(0,0,0,0.6);
+}
 
-  /* Romantic message */
-  #loveText{
-    color:#fff;
-    font-family:'Great Vibes', cursive;
-    font-size:clamp(30px,6vw,48px);
-    line-height:1.6;
-    max-width:90%;
-    margin:auto;
-    text-align:center;
-    text-shadow:0 8px 30px rgba(0,0,0,0.7);
-  }
+/* TAP BUTTON */
+#tapStart{
+  position:absolute;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:60;
+}
 
+.pill{
+  background:white;
+  padding:14px 20px;
+  border-radius:999px;
+  font-weight:900;
+  color:#ff2e7a;
+}
 
-  /* Tap overlay for audio problems */
-  #tapStart{
-    position:absolute;
-    inset:0;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:60;
-    background:rgba(0,0,0,.35);
-    backdrop-filter: blur(2px);
-  }
-  #tapStart .pill{
-    background:rgba(255,255,255,.92);
-    color:#ff2e7a;
-    font-weight:900;
-    padding:14px 18px;
-    border-radius:999px;
-    box-shadow:0 12px 30px rgba(0,0,0,.25);
-    font-family:"Poppins",sans-serif;
-  }
-
-  /* Offscreen YouTube player */
-  #ytWrap{
-    position:fixed;
-    left:-9999px;
-    top:-9999px;
-    width:360px;
-    height:240px;
-    overflow:hidden;
-  }
+/* Hidden YouTube player */
+#ytWrap{
+  position:fixed;
+  left:-9999px;
+  top:-9999px;
+  width:360px;
+  height:240px;
+}
 </style>
 </head>
 
 <body>
-  <!-- PAGE 1 -->
-  <div class="card" id="page1">
-    <h1>Will you be my Valentine? 💘</h1>
-    <p>(There is only one correct choice 😌💕)</p>
 
-    <div class="stage" id="stage">
-      <button id="yesBtn" class="btn">Yes 💖</button>
-      <button id="noBtn" class="btn">No 🙈</button>
+<!-- PAGE 1 -->
+<div class="card" id="page1">
+  <h1>Will you be my Valentine? 💘</h1>
+
+  <div class="stage" id="stage">
+    <button id="yesBtn" class="btn">Yes 💖</button>
+    <button id="noBtn" class="btn">No 🙈</button>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div id="page2">
+
+  <video id="valVideo" playsinline loop preload="auto" muted>
+    <source src="valentine.mp4" type="video/mp4">
+  </video>
+
+  <div id="tapStart"><div class="pill">Tap to start 🔊🎶💗</div></div>
+
+  <div id="overlay">
+    <div id="loveText">
+      Happy Valentine’s Day, my love ❤️<br><br>
+
+      Six years with you, and somehow every day still feels new, warm,
+      and filled with laughter. Even though I can’t be there beside you
+      right now, please know that you mean the world to me.<br><br>
+
+      I’m sorry I can’t be there today — but don’t worry,
+      because in just two weeks we’ll finally be together again,
+      celebrating us the way we always do. ✨<br><br>
+
+      Thank you for loving me, supporting me,
+      and being my safe place through everything.<br><br>
+
+      I love you endlessly… today, tomorrow, and always. 💕
     </div>
   </div>
 
-  <!-- PAGE 2 -->
-  <div id="page2">
-    <!-- Keep muted initially so autoplay works; we unmute after YES -->
-    <video id="valVideo" playsinline loop preload="auto" muted>
-      <source src="valentine.mp4" type="video/mp4">
-    </video>
+</div>
 
-    <div id="tapStart"><div class="pill">Tap to start sound 🔊🎶💗</div></div>
-
-    <div id="overlay">
-      <div id="loveText">
-        Happy Valentine’s Day, my love ❤️<br><br>
-        Six years with you, and somehow every day still feels new, warm,<br>
-        and filled with laughter. Even though I can’t be there beside you<br>
-        right now, please know that you mean the world to me.<br><br>
-        I’m sorry I can’t be there today — but don’t worry,<br>
-        because in just two weeks we’ll finally be together again,<br>
-        celebrating us the way we always do. ✨<br><br>
-        Thank you for loving me, supporting me,<br>
-        and being my safe place through everything.<br><br>
-        I love you endlessly… today, tomorrow, and always. 💕
-      </div>
-    </div>
-  </div>
-
-  <div id="ytWrap"><div id="ytPlayer"></div></div>
+<div id="ytWrap"><div id="ytPlayer"></div></div>
 
 <script>
-  const YOUTUBE_VIDEO_ID = "lplaAZBWiqY";
+const YOUTUBE_VIDEO_ID="lplaAZBWiqY";
 
-  const stage = document.getElementById("stage");
-  const noBtn  = document.getElementById("noBtn");
-  const yesBtn = document.getElementById("yesBtn");
+const stage=document.getElementById("stage");
+const noBtn=document.getElementById("noBtn");
+const yesBtn=document.getElementById("yesBtn");
 
-  const page1 = document.getElementById("page1");
-  const page2 = document.getElementById("page2");
+const page1=document.getElementById("page1");
+const page2=document.getElementById("page2");
+const video=document.getElementById("valVideo");
+const tapStart=document.getElementById("tapStart");
 
-  const video = document.getElementById("valVideo");
-  const tapStart = document.getElementById("tapStart");
+/* NO button moves */
+function moveNo(){
+  const s=stage.getBoundingClientRect();
+  const b=noBtn.getBoundingClientRect();
+  const x=Math.random()*(s.width-b.width-20)+10;
+  const y=Math.random()*(s.height-b.height-20)+10;
+  noBtn.style.left=x+"px";
+  noBtn.style.top=y+"px";
+  noBtn.style.transform="none";
+}
+noBtn.addEventListener("mouseenter",moveNo);
+noBtn.addEventListener("pointerdown",e=>{e.preventDefault();moveNo();});
 
-  // --- NO button dodge ---
-  function moveNo(){
-    const s = stage.getBoundingClientRect();
-    const b = noBtn.getBoundingClientRect();
-    const x = Math.random() * (s.width - b.width - 20) + 10;
-    const y = Math.random() * (s.height - b.height - 20) + 10;
-    noBtn.style.left = x + "px";
-    noBtn.style.top  = y + "px";
-    noBtn.style.transform = "none";
-  }
-  noBtn.addEventListener("mouseenter", moveNo);
-  noBtn.addEventListener("pointerdown", e => { e.preventDefault(); moveNo(); });
+/* YOUTUBE MUSIC */
+let ytPlayer=null;
 
-  // --- YouTube music ---
-  let ytPlayer = null;
+function loadYT(){
+  if(window.__ytLoaded) return;
+  window.__ytLoaded=true;
+  const tag=document.createElement("script");
+  tag.src="https://www.youtube.com/iframe_api";
+  document.head.appendChild(tag);
+}
 
-  function loadYTApiOnce(){
-    if (window.__ytLoaded) return;
-    window.__ytLoaded = true;
-    const tag = document.createElement("script");
-    tag.src = "https://www.youtube.com/iframe_api";
-    document.head.appendChild(tag);
-  }
+function playYouTubeMusic(){
+  loadYT();
 
-  function startYouTubeMusic(){
-    loadYTApiOnce();
-
-    const start = () => {
-      if (!window.YT || !YT.Player) { setTimeout(start, 200); return; }
-
-      if (!ytPlayer) {
-        ytPlayer = new YT.Player("ytPlayer", {
-          videoId: YOUTUBE_VIDEO_ID,
-          width: "360",
-          height: "240",
-          playerVars: {
-            autoplay: 1,
-            controls: 0,
-            loop: 1,
-            playlist: YOUTUBE_VIDEO_ID,
-            playsinline: 1,
-            rel: 0,
-            modestbranding: 1
-          },
-          events: {
-            onReady: () => {
-              try { ytPlayer.setVolume(70); ytPlayer.playVideo(); } catch {}
-            }
-          }
-        });
-      } else {
-        try { ytPlayer.playVideo(); } catch {}
-      }
-    };
-
-    start();
-    setTimeout(() => { try { ytPlayer && ytPlayer.playVideo(); } catch {} }, 600);
-    setTimeout(() => { try { ytPlayer && ytPlayer.playVideo(); } catch {} }, 1400);
-  }
-
-  async function enterFullscreenOnContainer() {
-    // Fullscreen the container (overlay stays visible)
-    try {
-      if (page2.requestFullscreen) await page2.requestFullscreen();
-    } catch {}
-  }
-
-  async function startExperience() {
-    page1.style.display = "none";
-    page2.style.display = "block";
-
-    // Ensure video is ready after display switch
-    video.load();
-
-    // Start muted autoplay (usually allowed)
-    try { await video.play(); } catch {}
-
-    // Turn sound on (still within YES click)
-    video.muted = false;
-    video.volume = 1.0;
-
-    try {
-      await video.play();
-      tapStart.style.display = "none";
-    } catch {
-      tapStart.style.display = "flex";
-      video.controls = true;
+  const start=()=>{
+    if(!window.YT||!YT.Player){
+      setTimeout(start,200);
+      return;
     }
 
-    // Start YouTube music
-    startYouTubeMusic();
+    if(!ytPlayer){
+      ytPlayer=new YT.Player("ytPlayer",{
+        videoId:YOUTUBE_VIDEO_ID,
+        playerVars:{
+          autoplay:1,
+          controls:0,
+          loop:1,
+          playlist:YOUTUBE_VIDEO_ID,
+          playsinline:1
+        },
+        events:{
+          onReady:()=>{
+            ytPlayer.setVolume(80);
+            ytPlayer.playVideo();
+          }
+        }
+      });
+    } else {
+      ytPlayer.playVideo();
+    }
+  };
 
-    // Best-effort fullscreen without losing overlay
-    await enterFullscreenOnContainer();
+  start();
+}
+
+async function startExperience(){
+  page1.style.display="none";
+  page2.style.display="block";
+
+  video.load();
+
+  try{await video.play();}catch{}
+
+  video.muted=false;
+  video.volume=1;
+
+  let ok=true;
+  try{await video.play();}
+  catch{
+    ok=false;
+    video.controls=true;
   }
 
-  yesBtn.addEventListener("click", startExperience);
+  playYouTubeMusic();
 
-  // If something was blocked, a tap retries sound + music
-  tapStart.addEventListener("pointerdown", async () => {
-    tapStart.style.display = "none";
-    try { video.muted = false; await video.play(); } catch { tapStart.style.display = "flex"; }
-    try { ytPlayer && ytPlayer.playVideo(); } catch {}
-  });
+  if(!ok) tapStart.style.display="flex";
+}
 
-  // Extra retry for YouTube on any tap on page2
-  page2.addEventListener("pointerdown", () => {
-    try { ytPlayer && ytPlayer.playVideo(); } catch {}
-  });
+yesBtn.addEventListener("click",startExperience);
+
+tapStart.addEventListener("pointerdown",async()=>{
+  tapStart.style.display="none";
+  try{video.muted=false;await video.play();}catch{tapStart.style.display="flex";}
+  try{ytPlayer&&ytPlayer.playVideo();}catch{}
+});
 </script>
+
 </body>
 </html>
-
