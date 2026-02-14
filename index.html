@@ -21,6 +21,7 @@
     overflow:hidden;
   }
 
+  /* Page 1 */
   .card{
     width:min(560px,92vw);
     background:rgba(255,255,255,0.9);
@@ -38,11 +39,7 @@
     text-shadow:0 4px 12px rgba(255,0,128,0.18);
   }
 
-  p{
-    margin:0 0 16px;
-    color:#b33c70;
-    font-weight:600;
-  }
+  p{ margin:0 0 16px; color:#b33c70; font-weight:600; }
 
   .stage{
     position:relative;
@@ -62,18 +59,15 @@
     cursor:pointer;
     position:absolute;
     box-shadow:0 10px 22px rgba(255,0,120,.22);
-    touch-action: manipulation;
-    transition:transform .15s ease;
+    touch-action:manipulation;
   }
-  .btn:hover{ transform:scale(1.06); }
-  .btn:active{ transform:scale(0.98); }
 
   #yesBtn{
     left:50%;
     top:60%;
     transform:translate(-120%,-50%);
     background:linear-gradient(45deg,#ff2e7a,#ff6aa7);
-    color:white;
+    color:#fff;
   }
 
   #noBtn{
@@ -84,7 +78,7 @@
     color:#7a003b;
   }
 
-  /* Page 2: full screen video */
+  /* Page 2 fullscreen */
   #page2{
     position:fixed;
     inset:0;
@@ -96,9 +90,7 @@
   #valVideo{
     width:100%;
     height:100%;
-    object-fit:cover;
-    transform: scale(0.92); /* unzoom a bit */
-    transform-origin:center;
+    object-fit:cover; /* fills screen */
     display:block;
     background:#000;
   }
@@ -114,14 +106,14 @@
   }
 
   #loveText{
-    color:white;
+    color:#fff;
     font-size:clamp(16px,4vw,22px);
     font-weight:800;
     text-shadow:0 4px 14px rgba(0,0,0,.55);
   }
 
-  /* Tap-to-enable audio overlay */
-  #tapSound{
+  /* Tap-to-start overlay if blocked */
+  #tapStart{
     position:absolute;
     inset:0;
     display:none;
@@ -131,13 +123,23 @@
     background:rgba(0,0,0,.35);
     backdrop-filter: blur(2px);
   }
-  #tapSound .pill{
+  #tapStart .pill{
     background:rgba(255,255,255,.92);
     color:#ff2e7a;
     font-weight:900;
     padding:14px 18px;
     border-radius:999px;
     box-shadow:0 12px 30px rgba(0,0,0,.25);
+  }
+
+  /* Offscreen YouTube player */
+  #ytWrap{
+    position:fixed;
+    left:-9999px;
+    top:-9999px;
+    width:360px;
+    height:240px;
+    overflow:hidden;
   }
 </style>
 </head>
@@ -156,31 +158,35 @@
 
   <!-- PAGE 2 -->
   <div id="page2">
-    <!-- Keep muted initially so autoplay works, then we unmute after YES -->
-    <video id="valVideo" autoplay loop muted playsinline preload="auto">
+    <video id="valVideo" playsinline loop preload="auto">
       <source src="valentine.mp4" type="video/mp4">
-      Your browser does not support the video tag.
     </video>
 
-    <div id="tapSound"><div class="pill">Tap to turn sound on 🔊💗</div></div>
+    <div id="tapStart"><div class="pill">Tap to start 🔊🎶💗</div></div>
 
     <div id="overlay">
       <div id="loveText">YAY!! 💖 I’m so lucky to have you. Happy Valentine’s, my love 🌹🥰</div>
     </div>
   </div>
 
+  <!-- YouTube music player -->
+  <div id="ytWrap"><div id="ytPlayer"></div></div>
+
 <script>
+  // YouTube song (your link -> video id)
+  const YOUTUBE_VIDEO_ID = "lplaAZBWiqY";
+
   const stage = document.getElementById("stage");
   const noBtn  = document.getElementById("noBtn");
   const yesBtn = document.getElementById("yesBtn");
 
-  const page1  = document.getElementById("page1");
-  const page2  = document.getElementById("page2");
+  const page1 = document.getElementById("page1");
+  const page2 = document.getElementById("page2");
 
-  const video  = document.getElementById("valVideo");
-  const tapSound = document.getElementById("tapSound");
+  const video = document.getElementById("valVideo");
+  const tapStart = document.getElementById("tapStart");
 
-  // NO button dodge
+  // --- NO button dodge ---
   function moveNo(){
     const s = stage.getBoundingClientRect();
     const b = noBtn.getBoundingClientRect();
@@ -193,47 +199,108 @@
   noBtn.addEventListener("mouseenter", moveNo);
   noBtn.addEventListener("pointerdown", e => { e.preventDefault(); moveNo(); });
 
-  async function showPage2AndStartVideoWithSound(){
+  // --- Fullscreen helpers ---
+  async function goFullscreenForVideo() {
+    try {
+      // Best for desktop / Android Chrome
+      if (video.requestFullscreen) return await video.requestFullscreen();
+      if (video.webkitRequestFullscreen) return await video.webkitRequestFullscreen();
+    } catch {}
+    try {
+      // iOS Safari sometimes supports this
+      if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+    } catch {}
+  }
+
+  // --- YouTube music (created after click for reliability) ---
+  let ytPlayer = null;
+
+  function loadYTApiOnce(){
+    if (window.__ytLoaded) return;
+    window.__ytLoaded = true;
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+  }
+
+  function ensureYTPlayerAndPlay(){
+    loadYTApiOnce();
+
+    const start = () => {
+      if (!window.YT || !YT.Player) { setTimeout(start, 200); return; }
+
+      if (!ytPlayer) {
+        ytPlayer = new YT.Player("ytPlayer", {
+          videoId: YOUTUBE_VIDEO_ID,
+          width: "360",
+          height: "240",
+          playerVars: {
+            autoplay: 1,
+            controls: 0,
+            loop: 1,
+            playlist: YOUTUBE_VIDEO_ID,
+            playsinline: 1,
+            rel: 0,
+            modestbranding: 1
+          },
+          events: {
+            onReady: () => {
+              try { ytPlayer.setVolume(70); ytPlayer.playVideo(); } catch {}
+            }
+          }
+        });
+      } else {
+        try { ytPlayer.playVideo(); } catch {}
+      }
+    };
+
+    start();
+    setTimeout(() => { try { ytPlayer && ytPlayer.playVideo(); } catch {} }, 600);
+    setTimeout(() => { try { ytPlayer && ytPlayer.playVideo(); } catch {} }, 1400);
+  }
+
+  // --- Start everything ---
+  async function startExperience() {
+    // Switch pages
     page1.style.display = "none";
     page2.style.display = "block";
 
-    // Reload source after display switch
+    // Make sure video reloads and is ready
     video.load();
 
-    // Autoplay muted first (usually allowed)
-    try { await video.play(); } catch {}
-
-    // Now attempt to turn sound on (this is still inside the YES click flow)
+    // Turn on video sound
     video.muted = false;
     video.volume = 1.0;
 
-    try {
-      await video.play();
-      tapSound.style.display = "none";
-    } catch {
-      // If unmuted play is blocked, show tap overlay
-      tapSound.style.display = "flex";
-      video.controls = true;
-    }
+    // Try to play video (with sound)
+    let videoOk = true;
+    try { await video.play(); }
+    catch { videoOk = false; video.controls = true; }
 
-    // Fullscreen attempt (Android yes; iOS limited)
-    if (document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen().catch(()=>{});
-    }
+    // Start YouTube music AFTER the page switch (and after video starts)
+    // If you want ONLY video sound, comment this out:
+    ensureYTPlayerAndPlay();
+
+    // Fullscreen attempt (best effort)
+    await goFullscreenForVideo();
+
+    // If video or music got blocked, show tap overlay
+    // (tapping will retry both)
+    if (!videoOk) tapStart.style.display = "flex";
   }
 
-  yesBtn.addEventListener("click", () => {
-    showPage2AndStartVideoWithSound();
+  yesBtn.addEventListener("click", startExperience);
+
+  // If browser blocks playback, user tap retries
+  tapStart.addEventListener("pointerdown", async () => {
+    tapStart.style.display = "none";
+    try { video.muted = false; await video.play(); } catch { tapStart.style.display = "flex"; }
+    try { ytPlayer && ytPlayer.playVideo(); } catch {}
   });
 
-  // If browser blocks unmuted playback, user tap will enable sound
-  tapSound.addEventListener("pointerdown", async () => {
-    video.muted = false;
-    video.volume = 1.0;
-    try {
-      await video.play();
-      tapSound.style.display = "none";
-    } catch {}
+  // Also allow tapping anywhere on page2 to retry music
+  page2.addEventListener("pointerdown", () => {
+    try { ytPlayer && ytPlayer.playVideo(); } catch {}
   });
 </script>
 </body>
