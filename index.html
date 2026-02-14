@@ -118,18 +118,24 @@
     text-shadow:0 4px 14px rgba(0,0,0,.55);
   }
 
-  #tapHint{
+  /* Tap-to-start overlay (only shown if autoplay blocked) */
+  #tapToStart{
     position:absolute;
-    top:14px;
-    left:14px;
-    right:14px;
-    color:rgba(255,255,255,.88);
-    font-size:12px;
-    font-weight:600;
-    text-shadow:0 2px 10px rgba(0,0,0,.55);
-    pointer-events:none;
-    opacity:0;
-    transition:opacity .2s ease;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:60;
+    background:rgba(0,0,0,.35);
+    backdrop-filter: blur(2px);
+  }
+  #tapToStart .pill{
+    background:rgba(255,255,255,.92);
+    color:#ff2e7a;
+    font-weight:900;
+    padding:14px 18px;
+    border-radius:999px;
+    box-shadow:0 12px 30px rgba(0,0,0,.25);
   }
 
   /* offscreen YT player */
@@ -158,11 +164,11 @@
 
   <!-- PAGE 2 -->
   <div id="page2">
-    <div id="tapHint">Tap once if the video doesn’t start 💗</div>
-
     <video id="valVideo" autoplay loop muted playsinline preload="auto">
       <source src="valentine.mp4" type="video/mp4">
     </video>
+
+    <div id="tapToStart"><div class="pill">Tap to start 💗</div></div>
 
     <div id="overlay">
       <div id="loveText">YAY!! 💖 I’m so lucky to have you. Happy Valentine’s, my love 🌹🥰</div>
@@ -178,11 +184,12 @@
   const page1  = document.getElementById("page1");
   const page2  = document.getElementById("page2");
   const video  = document.getElementById("valVideo");
-  const tapHint = document.getElementById("tapHint");
+  const tapToStart = document.getElementById("tapToStart");
 
   const YOUTUBE_VIDEO_ID = "lplaAZBWiqY";
   let ytPlayer = null;
 
+  // NO button dodge
   function moveNo(){
     const s = stage.getBoundingClientRect();
     const b = noBtn.getBoundingClientRect();
@@ -195,6 +202,7 @@
   noBtn.addEventListener("mouseenter", moveNo);
   noBtn.addEventListener("pointerdown", e => { e.preventDefault(); moveNo(); });
 
+  // YouTube (start later to avoid fighting with video autoplay)
   function loadYouTubeAPIOnce(){
     if (window.__ytLoaded) return;
     window.__ytLoaded = true;
@@ -239,39 +247,43 @@
     setTimeout(() => { try { ytPlayer && ytPlayer.playVideo(); } catch {} }, 1400);
   }
 
-  async function goToPage2AndPlayVideo(){
+  async function showPage2AndPlayVideo(){
     page1.style.display = "none";
     page2.style.display = "block";
 
-    // Ensure the browser re-reads the source after display switch
+    // force reload after being shown
     video.load();
 
-    // Attempt to play
     try {
       await video.play();
-      tapHint.style.opacity = "0";
+      tapToStart.style.display = "none";
     } catch {
-      // If blocked, show hint + controls so user can tap play
-      tapHint.style.opacity = "1";
+      // show tap overlay if blocked
+      tapToStart.style.display = "flex";
       video.controls = true;
     }
+  }
+
+  // YES: video first, then music
+  yesBtn.addEventListener("click", async () => {
+    await showPage2AndPlayVideo();
+
+    // Let the video "lock in" first, then start music
+    setTimeout(() => {
+      createAndPlayYT();
+    }, 1000);
 
     // Fullscreen attempt (Android yes; iOS limited)
     if (document.documentElement.requestFullscreen) {
       document.documentElement.requestFullscreen().catch(()=>{});
     }
-  }
-
-  yesBtn.addEventListener("click", async () => {
-    await goToPage2AndPlayVideo();
-    createAndPlayYT();
   });
 
-  // If autoplay was blocked, first tap will start video
-  page2.addEventListener("pointerdown", async () => {
+  // If autoplay blocked, tapping starts it
+  tapToStart.addEventListener("pointerdown", async () => {
     try {
       await video.play();
-      tapHint.style.opacity = "0";
+      tapToStart.style.display = "none";
     } catch {}
   });
 </script>
