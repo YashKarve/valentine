@@ -29,6 +29,7 @@
     padding:28px 22px;
     box-shadow:0 18px 50px rgba(255,105,180,0.25);
     text-align:center;
+    z-index:2;
   }
 
   h1{
@@ -60,7 +61,7 @@
     position:absolute;
     box-shadow:0 10px 22px rgba(255,0,120,.22);
     touch-action:manipulation;
-    transition:transform .15s ease;
+    transition:transform .15s ease, filter .15s ease;
   }
   .btn:hover{ transform:scale(1.06); }
   .btn:active{ transform:scale(0.98); }
@@ -90,7 +91,7 @@
     z-index:50;
   }
 
-  /* IMPORTANT: keep video inline so overlay stays visible */
+  /* Keep video inline so overlay stays visible */
   #valVideo{
     width:100%;
     height:100%;
@@ -118,7 +119,7 @@
     text-shadow:0 4px 14px rgba(0,0,0,.55);
   }
 
-  /* Tap overlay for audio problems */
+  /* If sound or music gets blocked, show a big tap button */
   #tapStart{
     position:absolute;
     inset:0;
@@ -138,7 +139,7 @@
     box-shadow:0 12px 30px rgba(0,0,0,.25);
   }
 
-  /* Offscreen YouTube player */
+  /* Hidden YouTube player (audio) */
   #ytWrap{
     position:fixed;
     left:-9999px;
@@ -167,20 +168,26 @@
     <!-- Keep muted initially so autoplay works; we unmute after YES -->
     <video id="valVideo" playsinline loop preload="auto" muted>
       <source src="valentine.mp4" type="video/mp4">
+      Your browser does not support the video tag.
     </video>
 
-    <div id="tapStart"><div class="pill">Tap to start sound 🔊🎶💗</div></div>
+    <div id="tapStart"><div class="pill">Tap to start 🔊🎶💗</div></div>
 
     <div id="overlay">
       <div id="loveText">YAY!! 💖 I’m so lucky to have you. Happy Valentine’s, my love 🌹🥰</div>
     </div>
   </div>
 
+  <!-- YouTube music player (hidden) -->
   <div id="ytWrap"><div id="ytPlayer"></div></div>
 
 <script>
+  // ===== CONFIG =====
+  // YouTube link you gave:
+  // https://www.youtube.com/watch?v=lplaAZBWiqY&list=RDlplaAZBWiqY&start_radio=1
   const YOUTUBE_VIDEO_ID = "lplaAZBWiqY";
 
+  // ===== ELEMENTS =====
   const stage = document.getElementById("stage");
   const noBtn  = document.getElementById("noBtn");
   const yesBtn = document.getElementById("yesBtn");
@@ -191,7 +198,7 @@
   const video = document.getElementById("valVideo");
   const tapStart = document.getElementById("tapStart");
 
-  // --- NO button dodge ---
+  // ===== NO button dodge =====
   function moveNo(){
     const s = stage.getBoundingClientRect();
     const b = noBtn.getBoundingClientRect();
@@ -204,22 +211,26 @@
   noBtn.addEventListener("mouseenter", moveNo);
   noBtn.addEventListener("pointerdown", e => { e.preventDefault(); moveNo(); });
 
-  // --- YouTube music (optional) ---
+  // ===== YouTube Music (reliable) =====
   let ytPlayer = null;
 
-  function loadYTApiOnce(){
+  function loadYT(){
     if (window.__ytLoaded) return;
     window.__ytLoaded = true;
+
     const tag = document.createElement("script");
     tag.src = "https://www.youtube.com/iframe_api";
     document.head.appendChild(tag);
   }
 
-  function startYouTubeMusic(){
-    loadYTApiOnce();
+  function playYouTubeMusic(){
+    loadYT();
 
     const start = () => {
-      if (!window.YT || !YT.Player) { setTimeout(start, 200); return; }
+      if (!window.YT || !YT.Player) {
+        setTimeout(start, 200);
+        return;
+      }
 
       if (!ytPlayer) {
         ytPlayer = new YT.Player("ytPlayer", {
@@ -237,7 +248,10 @@
           },
           events: {
             onReady: () => {
-              try { ytPlayer.setVolume(70); ytPlayer.playVideo(); } catch {}
+              try {
+                ytPlayer.setVolume(80);
+                ytPlayer.playVideo();
+              } catch {}
             }
           }
         });
@@ -247,57 +261,67 @@
     };
 
     start();
-    setTimeout(() => { try { ytPlayer && ytPlayer.playVideo(); } catch {} }, 600);
-    setTimeout(() => { try { ytPlayer && ytPlayer.playVideo(); } catch {} }, 1400);
+
+    // retries help Chrome start reliably
+    setTimeout(() => { try { ytPlayer && ytPlayer.playVideo(); } catch {} }, 800);
+    setTimeout(() => { try { ytPlayer && ytPlayer.playVideo(); } catch {} }, 1800);
   }
 
-  async function enterFullscreenOnContainer() {
-    // Fullscreen the container (overlay stays visible)
+  // ===== Fullscreen best-effort (container, not video) =====
+  async function fullscreenContainer(){
     try {
       if (page2.requestFullscreen) await page2.requestFullscreen();
     } catch {}
   }
 
-  async function startExperience() {
+  // ===== Start Experience =====
+  async function startExperience(){
     page1.style.display = "none";
     page2.style.display = "block";
 
     // Ensure video is ready after display switch
     video.load();
 
-    // Start muted autoplay (usually allowed)
+    // Start video muted first (allowed more often)
     try { await video.play(); } catch {}
 
-    // Turn sound on (still within YES click)
+    // Turn sound on for video (optional — if you want ONLY YouTube music, comment these 2 lines)
     video.muted = false;
     video.volume = 1.0;
 
+    let videoSoundOk = true;
     try {
       await video.play();
-      tapStart.style.display = "none";
     } catch {
-      tapStart.style.display = "flex";
+      videoSoundOk = false;
       video.controls = true;
     }
 
-    // OPTIONAL: start YouTube music too
-    // If you DON'T want YouTube music, comment out the next line.
-    startYouTubeMusic();
+    // Start YouTube music
+    playYouTubeMusic();
 
-    // Best-effort fullscreen without losing overlay
-    await enterFullscreenOnContainer();
+    // Fullscreen attempt (overlay stays visible)
+    await fullscreenContainer();
+
+    // If video sound got blocked, show tap button (tap also retriggers YouTube)
+    if (!videoSoundOk) tapStart.style.display = "flex";
   }
 
   yesBtn.addEventListener("click", startExperience);
 
-  // If something was blocked, a tap retries sound + music
+  // If something is blocked, tapping starts both
   tapStart.addEventListener("pointerdown", async () => {
     tapStart.style.display = "none";
-    try { video.muted = false; await video.play(); } catch { tapStart.style.display = "flex"; }
+    try {
+      video.muted = false;
+      await video.play();
+    } catch {
+      tapStart.style.display = "flex";
+    }
     try { ytPlayer && ytPlayer.playVideo(); } catch {}
   });
 
-  // Extra retry for YouTube on any tap on page2 (helps with blockers)
+  // Extra retry: any tap on page2 tries to start YouTube music again
   page2.addEventListener("pointerdown", () => {
     try { ytPlayer && ytPlayer.playVideo(); } catch {}
   });
